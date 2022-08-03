@@ -54,7 +54,7 @@ def addSectionEnd(binary):
 
     pe.FILE_HEADER.NumberOfSections +=1
     pe.OPTIONAL_HEADER.SizeOfImage = int(virtual_size) + int(virtual_offset)
-    pe.write("malware_file_with_new_sectiom.exe")
+    pe.write("malware_file_with_new_section.exe")
 
     reopen = open("malware_file_with_new_sectiom.exe", "a+b")
     map = mmap.mmap(reopen.fileno(), 0 , access = mmap.ACCESS_WRITE)
@@ -64,7 +64,7 @@ def addSectionEnd(binary):
     #print(pe.sections[number_of_section])
 
 
-binary = "/home/kshitiz/Downloads/research/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC"
+binary = "putty.exe"
 addSectionEnd(binary)
 
 
