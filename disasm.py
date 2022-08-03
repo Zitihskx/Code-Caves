@@ -3,7 +3,8 @@ import r2pipe
 
 
 
-pe = pefile.PE("/home/kshitiz/Downloads/research/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", fast_load=True)
+#pe = pefile.PE("/home/kshitiz/Downloads/research/Data/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", fast_load=True)
+pe = pefile.PE("new_malware.exe")
 
 #print(pe.print_info())
 
@@ -45,12 +46,18 @@ for section in pe.sections:
        "\n|\n|---- Characterisitcs : " + hex(section.Characteristics)+'\n')    
 print("*" * 50)
 
-#print(pe.sections[1])
-print(pe.sections[1].sizeof())
-#r2 = r2pipe.open("/home/kshitiz/Downloads/research/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", ['-2'])
+print(pe.sections[1])
+
 new_section = pefile.SectionStructure(pe.__IMAGE_SECTION_HEADER_format__)
-#print(bytearray(new_section.sizeof()))
 
-#print(pe.sections[-1].get_file_offset())
 
-#print(len(pe.__data__))
+
+
+print(len(pe.__data__))
+
+#print(pe.get_data(12288,200))
+
+#pe.__data__[61440:61445] = b'\x05\x90\x60\x80\x00\x00'
+
+print(pe.__data__[65530:65540])
+
