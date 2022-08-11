@@ -4,10 +4,10 @@ import mmap
 import sys
 
 
-def align(val_to_align, alignment):
+def align(val_to_align, alignment): #Aligning the change size with the page size of system
     return ((val_to_align+alignment-1)/alignment)*alignment
 
-def IncreaseFileSize(binary, original_size):
+def IncreaseFileSize(binary, original_size): #Increasing the size of binary file
     fil = open(binary, 'a+b')
     map = mmap.mmap(fil.fileno(), 0, access = mmap.ACCESS_WRITE)
     map.resize(original_size + 0x2000)
@@ -32,7 +32,7 @@ def insertCaves(malware, target_section, cave_size=0):
     elif pe.OPTIONAL_HEADER.DATA_DIRECTORY[14].VirtualAddress != 0 or pe.OPTIONAL_HEADER.DATA_DIRECTORY[14].Size != 0:
         pe.close()
         raise NotPE()
-    raw_addition = int(align(0x1000, pe.OPTIONAL_HEADER.FileAlignment))
+    raw_addition = int(align(0x1000, pe.OPTIONAL_HEADER.FileAlignment)) 
     virtual_addition = int(align(0x1000, pe.OPTIONAL_HEADER.SectionAlignment))
     target_found = False
 
@@ -43,14 +43,14 @@ def insertCaves(malware, target_section, cave_size=0):
     #Working on the headers
 
     for section in pe.sections:
-        if section.Name.decode().rstrip('\x00') == target_section:
+        if section.Name.decode().rstrip('\x00') == target_section: #Changes in section header where code caves are being changed
             temp_VirtualSize = section.Misc_VirtualSize
             section.Misc_VirtualSize += virtual_addition + 1
             section.SizeOfRawData += raw_addition + 1
             changing_virtual_address = section.VirtualAddress
             target_found = True
         
-        if target_found == True and section.VirtualAddress > changing_virtual_address:
+        if target_found == True and section.VirtualAddress > changing_virtual_address: #Changing all the sections following the code caves
             
             section.VirtualAddress += virtual_addition + 0x1
             section.PointerToRawData += raw_addition + 0x1
@@ -68,10 +68,11 @@ def insertCaves(malware, target_section, cave_size=0):
     print(int(Increased_size))
     print(int(changing_virtual_address)+int(temp_VirtualSize))
     print(int(original_size))
-
+    
+    #Shifting all the data below
     pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)+ int(virtual_addition)+1):(int(original_size)+ int(virtual_addition)+ 1)] = pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)):(int(original_size))]
 
-
+    #Making sure all the bytes in code cave is b'\x00'
     for data in pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)):(int(changing_virtual_address)+int(temp_VirtualSize)+ int(virtual_addition))]:
          data = 0
 
