@@ -1,56 +1,58 @@
+
+
+#direct = "/home/kshitiz/Desktop/Code caves/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC"
+import sys
+import os
+import numpy as np
 import pefile
-import r2pipe
 
-
-
-pe = pefile.PE("new_malware.exe", fast_load=True)
-
-#print(pe.print_info())
-
-print("Machine : " + hex(pe.FILE_HEADER.Machine))
-# Check if it is a 32-bit or 64-bit binary
-if hex(pe.FILE_HEADER.Machine) == '0x14c':
-    print("This is a 32-bit binary")
+pe = pefile.PE("0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC")
+#print("Machine: " + hex(pe.FILE_HEADER.Machine))
+if hex(pe.FILE_HEADER.Machine) =='0x14c':
+    print("This is a 32bit binary")
 else:
     print("This is a 64-bit binary")
-print("TimeDateStamp : " + pe.FILE_HEADER.dump_dict()['TimeDateStamp']['Value'].split('[')[1][:-1]
-)
-print("NumberOfSections : " + hex(pe.FILE_HEADER.NumberOfSections))
 
-print("Characteristics flags : " + hex(pe.FILE_HEADER.Characteristics))
+print("Number of sections: "+ hex(pe.FILE_HEADER.NumberOfSections))
 
+print("Magic: "+ hex(pe.OPTIONAL_HEADER.Magic))
+print("Section Alignment: "+ hex(pe.OPTIONAL_HEADER.SectionAlignment))
+print("File Alignment: "+ hex(pe.OPTIONAL_HEADER.FileAlignment))
 
-print ("Optional Header Content:")
-print("Magic : " + hex(pe.OPTIONAL_HEADER.Magic))
-print("ImageBase : " + hex(pe.OPTIONAL_HEADER.ImageBase))
-print("SectionAlignment : " + hex(pe.OPTIONAL_HEADER.SectionAlignment))
-print("FileAlignment : " + hex(pe.OPTIONAL_HEADER.FileAlignment))
-print("SizeOfImage : " + hex(pe.OPTIONAL_HEADER.SizeOfImage))
-print("DllCharacteristics flags : " + hex(pe.OPTIONAL_HEADER.DllCharacteristics))
-print("DataDirectory: ")
-print("*" * 50)
-# print name, size and virtualaddress of every DATA_ENTRY in DATA_DIRECTORY
-for entry in pe.OPTIONAL_HEADER.DATA_DIRECTORY:
-    print(entry.name + "\n|\n|---- Size : " + str(entry.Size) + "\n|\n|---- VirutalAddress : " + hex(entry.VirtualAddress) + '\n')    
-print("*" * 50)
+print("Size of Image: "+ hex(pe.OPTIONAL_HEADER.SizeOfImage))
 
+print("Size of Image in integer:{}".format(pe.OPTIONAL_HEADER.SizeOfImage))
 
-print("\n Section Header contents \n")
-print("Sections Info: \n")
-print("*" * 50)
 for section in pe.sections:
     print(section.Name.decode().rstrip('\x00') + "\n|\n|---- Vitual Size : " + hex(section.Misc_VirtualSize) +
      "\n|\n|---- VirutalAddress : " + hex(section.VirtualAddress) + "\n|\n|---- SizeOfRawData : " +
       hex(section.SizeOfRawData) + "\n|\n|---- PointerToRawData : " + hex(section.PointerToRawData) +
        "\n|\n|---- Characterisitcs : " + hex(section.Characteristics)+'\n')    
+    
+
+
+    va = section.VirtualAddress
+    vs = section.Misc_VirtualSize
+    ea = section.VirtualAddress+section.Misc_VirtualSize-1
+
+    print("Starting location: {}".format(section.VirtualAddress))
+    print("Size of section in bytes: {}".format(section.Misc_VirtualSize))
+    print("Location of last byte of section:{}".format(section.VirtualAddress+section.Misc_VirtualSize-1))
+
+    count =0
+    i = 0
+    df = pd.DataFrame(columns = ['Section', 'Starting_Addr', 'Ending_Addr', 'Size'])
+    for byte in pe.__data__[va:ea]:
+        if byte == 0x00:
+            count += 1
+        else:
+            if count>min_size:
+                
+
+
+
 print("*" * 50)
 
-#print(pe.sections[1])
-print(pe.sections[1].sizeof())
-#r2 = r2pipe.open("/home/kshitiz/Downloads/research/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", ['-2'])
-new_section = pefile.SectionStructure(pe.__IMAGE_SECTION_HEADER_format__)
-#print(bytearray(new_section.sizeof()))
 
-#print(pe.sections[-1].get_file_offset())
 
-#print(len(pe.__data__))
+
