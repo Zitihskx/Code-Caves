@@ -1,10 +1,12 @@
+
+#Disassembly details of a pe file
 import pefile
 import r2pipe
 
 
 
-#pe = pefile.PE("/home/kshitiz/Downloads/research/Data/sample_mal/0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", fast_load=True)
-pe = pefile.PE("new_malware.exe")
+#pe = pefile.PE("0B7FEFAF5C8F3A320DC08EC32BD5955F0B3B2E35034C8B2AD879AE6BDC2CC0BC", fast_load=True)
+pe = pefile.PE("final_malware.exe")
 
 #print(pe.print_info())
 
@@ -43,7 +45,7 @@ for section in pe.sections:
     print(section.Name.decode().rstrip('\x00') + "\n|\n|---- Vitual Size : " + hex(section.Misc_VirtualSize) +
      "\n|\n|---- VirutalAddress : " + hex(section.VirtualAddress) + "\n|\n|---- SizeOfRawData : " +
       hex(section.SizeOfRawData) + "\n|\n|---- PointerToRawData : " + hex(section.PointerToRawData) +
-       "\n|\n|---- Characterisitcs : " + hex(section.Characteristics)+'\n')    
+       "\n|\n|---- Characterisitcs : " + hex(section.Characteristics)+'\n')
 print("*" * 50)
 
 print(pe.sections[1])

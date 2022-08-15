@@ -1,4 +1,6 @@
-#Inserting codecaves in between the section (At the end of each individual section)
+
+#Inserting codecaves in the region other than at the end of sections 
+
 import pefile
 import os 
 import mmap
@@ -15,7 +17,7 @@ def IncreaseFileSize(binary, original_size):
     map.close()
     fil.close()
 
-def insertCaves(malware, target_section, cave_size=0):
+def insertCaves(malware,target_section, start_address, cave_size=0):
     original_size = os.path.getsize(malware)
     print("Original Size", original_size)
     pe = pefile.PE(malware, fast_load=True)
@@ -39,8 +41,7 @@ def insertCaves(malware, target_section, cave_size=0):
 
     print("Raw Addition ", raw_addition)
     print("Virtual Addition ", virtual_addition)
-    print("Raw Addition ", raw_addition+1)
-    print("Virtual Addition ", virtual_addition+1)
+
     #Working on the headers
 
     for section in pe.sections:
@@ -60,7 +61,7 @@ def insertCaves(malware, target_section, cave_size=0):
     pe.OPTIONAL_HEADER.SizeOfImage += virtual_addition 
 
     for entry in pe.OPTIONAL_HEADER.DATA_DIRECTORY:
-        if entry.Size>0 and entry.VirtualAddress > changing_virtual_address:
+        if entry.Size>0 and entry.VirtualAddress >= start_address:
             entry.VirtualAddress += virtual_addition +1
     
     #print(int(changing_virtual_address))
@@ -70,10 +71,10 @@ def insertCaves(malware, target_section, cave_size=0):
     print(int(changing_virtual_address)+int(temp_VirtualSize))
     print(int(original_size))
 
-    pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)+ int(virtual_addition)+1):(int(original_size)+ int(virtual_addition)+ 1)] = pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)):(int(original_size))]
+    pe.__data__[(start_address + int(virtual_addition)+1):(int(original_size)+ int(virtual_addition)+ 1)] = pe.__data__[start_address:(int(original_size))]
 
 
-    for data in pe.__data__[(int(changing_virtual_address)+int(temp_VirtualSize)):(int(changing_virtual_address)+int(temp_VirtualSize)+ int(virtual_addition))]:
+    for data in pe.__data__[start_address:(start_address+ int(virtual_addition))]:
          data = 0
 
     pe.write("final_malware.exe")
@@ -95,4 +96,5 @@ elif inp == 4:
 else:
     print("Invalid section value entered")
     sys.exit()
-insertCaves(direct, target_section)
+start_address = 10395
+insertCaves(direct, target_section, start_address)
